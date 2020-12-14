@@ -1,4 +1,22 @@
-# react-native-sqlite-storage
+# react-native-sqlcipher-storage
+
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Basic Installation](#basic-installation)
+    * [iOS](#iOS)
+    * [Android](#Android)
+3. [Copy & Open Database](#Copy-&-Open-Database)
+4. [Copy & Open Pre-Populated Database](#Copy-&-Open-Pre-Populated-Database)
+    * [iOS](#iOS-1)
+    * [Android](#Android-1)
+5. [Promises](#Promises)
+6. [Additional Options for Pre-Populated Database Files](#Additional-Options-for-Pre-Populated-Database-Files)
+7. [Attaching Another Database](#Attaching-Another-database)
+
+<br><br>
+
+## Introduction
+
 SQLite3 Native Plugin for React Native for both Android (Classic and Native), iOS and Windows
 
 Foundation of this library is based on Chris Brody's Cordova SQLite plugin.
@@ -18,48 +36,54 @@ The library has been tested with React 16.2 (and earlier) and XCode 7,8,9 - it w
 
 Version 3.2 is the first version compatible with RN 0.40.
 
-# Installation
-```
-  npm install --save react-native-sqlite-storage
-```
-Then follow the instructions for your platform to link react-native-sqlite-storage into your project
+## Differences in this Fork
+This fork was created after countless hours of trying to open an encrypted database, attempting to follow instructions on the master repo's issues discussions about how to open an encrypted database and debugging other issues. This fork is meant to open an encrypted database straight out of the box. Along with encrypted database, this fork allows the use of the cache directory for iOS. 
 
-## Promises
-To enable promises, run 
-```javascript
-SQLite.enablePromise(true);
-```
+Again, thank you for all the developer that created this package. The work I have put into this is very minimal. 
 
-## iOS
-#### Standard Method
-** React Native 0.60 and above **
+Original repo: ```https://github.com/andpor/react-native-sqlite-storage```
+
+## Basic Installation
+```
+  npm install --save https://github.com/Kiranpreetsb/react-native-sqlcipher-storage
+
+  or 
+
+  yarn add https://github.com/Kiranpreetsb/react-native-sqlcipher-storage
+```
+Then follow the instructions for your platform to link react-native-sqlcipher-storage into your project
+
+### iOS
+
+### React Native 0.60 and above
+
 Run `cd ios && pod install && cd ..`. Linking is not required in React Native 0.60 and above
 
-** React Native 0.59 and below **
+### React Native 0.59 and below**
 
-#### Step 1. Install Dependencies
+##### Step 1. Install Dependencies
 
-##### With CocoaPods:
+###### With CocoaPods:
 
 Add this to your Podfile which should be located inside the ios project subdirectory
 ```ruby
 pod 'React', :path => '../node_modules/react-native'
-pod 'react-native-sqlite-storage', :path => '../node_modules/react-native-sqlite-storage'
+pod 'react-native-sqlcipher-storage', :path => '../node_modules/react-native-sqlcipher-storage'
 ```
 Or use the sample Podfile included in the package by copying it over to ios subdirectory and replacing AwesomeProject inside of it with the name of your RN project.
 
 Refresh the Pods installation
 ```ruby
 pod install
-```
+
 OR
-```ruby
+
 pod update
 ```
 
 Done, skip to Step 2.
 
-##### Without CocoaPods:
+###### Without CocoaPods:
 
 This command should be executed in the root directory of your RN project
 ```shell
@@ -87,15 +111,16 @@ Add libSQLite.a (from Workspace location) to the required Libraries and Framewor
 
 ![alt tag](https://raw.github.com/andpor/react-native-sqlite-storage/master/instructions/addlibs.png)
 
-#### Step 2. Application JavaScript require
+##### Step 2. Application JavaScript require
 
-Add var SQLite = require('react-native-sqlite-storage') to your index.ios.js
+```javascript
+import SQLite from 'react-native-sqlite-storage';
+```
 
-![alt tag](instructions/require.png)
+##### Step 3. Write application JavaScript code using the SQLite plugin
 
-#### Step 3. Write application JavaScript code using the SQLite plugin
 
-Add JS application code to use SQLite API in your index.ios.js etc. Here is some sample code. For full working example see test/index.ios.callback.js. Please note that Promise based API is now supported as well with full examples in the working React Native app under test/index.ios.promise.js
+Add JS application code to use SQLite API in your index.ios.js, etc. Here is some sample code. For full working example see test/index.ios.callback.js. Please note that Promise based API is now supported as well with full examples in the working React Native app under test/index.ios.promise.js
 
 ```javascript
 errorCB(err) {
@@ -134,22 +159,22 @@ db.transaction((tx) => {
 });
 ```
 
-# How to use (Android):
+### Android
 
-** React Native 0.60 and above **
+### React Native 0.60 and above
 If you would like to use the devices SQLite there are no extra steps.
 However, if you would like to use the SQLite bundled with this library (includes support for FTS5), add the following to your `react-native.config.js`
 
-```js
+```javascript
 module.exports = {
   ...,
   dependencies: {
     ...,
-    "react-native-sqlite-storage": {
+    "react-native-sqlcipher-storage": {
       platforms: {
         android: {
           sourceDir:
-            "../node_modules/react-native-sqlite-storage/platforms/android-native",
+            "../node_modules/react-native-sqlcipher-storage/platforms/android-native",
           packageImportPath: "import io.liteglue.SQLitePluginPackage;",
           packageInstance: "new SQLitePluginPackage()"
         }
@@ -161,20 +186,20 @@ module.exports = {
 };
 ```
 
-** React Native 0.59 and below **
+### React Native 0.59 and below
 
-#### Step 1 - Update Gradle Settings (located under Gradle Settings in Project Panel)
+##### Step 1 - Update Gradle Settings (located under Gradle Settings in Project Panel)
 
 ```gradle
 // file: android/settings.gradle
 ...
 
-include ':react-native-sqlite-storage'
-project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/platforms/android') // react-native-sqlite-storage >= 4.0.0
-// IMPORTANT: if you are working with a version less than 4.0.0 the project directory is '../node_modules/react-native-sqlite-storage/src/android'
+include ':react-native-sqlcipher-storage'
+project(':react-native-sqlcipher-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlcipher-storage/platforms/android') // react-native-sqlcipher-storage >= 4.0.0
+// IMPORTANT: if you are working with a version less than 4.0.0 the project directory is '../node_modules/react-native-sqlcipher-storage/src/android'
 ```
 
-#### Step 2 - Update app module Gradle Build script (located under Gradle Settings in Project Panel)
+##### Step 2 - Update app module Gradle Build script (located under Gradle Settings in Project Panel)
 
 ```gradle
 // file: android/app/build.gradle
@@ -182,11 +207,11 @@ project(':react-native-sqlite-storage').projectDir = new File(rootProject.projec
 
 dependencies {
     ...
-    implementation project(':react-native-sqlite-storage')
+    implementation project(':react-native-sqlcipher-storage')
 }
 ```
 
-#### Step 3 - Register React Package (this should work on React version but if it does not , try the ReactActivity based approach. Note: for version 3.0.0 and below you would have to pass in the instance of your Activity to the SQLitePluginPackage constructor
+##### Step 3 - Register React Package (this should work on React version but if it does not , try the ReactActivity based approach. Note: for version 3.0.0 and below you would have to pass in the instance of your Activity to the SQLitePluginPackage constructor
 
 ```java
 ...
@@ -238,69 +263,23 @@ public class MainApplication extends Application implements ReactApplication {
 }
 ```
 
-#### Step 4 - Require and use in Javascript - see full examples (callbacks and Promise) in test directory.
+##### Step 4 - Require and use in Javascript - see full examples (callbacks and Promise) in test directory.
 
 ```js
 // file: index.android.js
 
 var React = require('react-native');
-var SQLite = require('react-native-sqlite-storage')
+var SQLite = require('react-native-sqlcipher-storage')
 ...
 ```
 
-## Setting up your project to import a pre-populated SQLite database from application for iOS
+## Copy & Open Database
 
-#### Step 1 - Create 'www' folder.
-
-Create a folder called 'www' (yes must be called precisely that else things won't work) in the project folder via Finder
-
-#### Step 2 - Create the database file
-
-Copy/paste your pre-populated database file into the 'www' folder. Give it the same name you are going to use in openDatabase call in your application
-
-#### Step 3 - Add file to project
-
-in XCode, right click on the main folder and select Add Files to 'your project name'
-
-![alt tag](https://raw.github.com/andpor/react-native-sqlite-storage/master/instructions/addFilesToProject.png)
-
-#### Step 4 - Choose files to add
-
-In the Add Files dialog, navigate to the 'www' directory you created in Step 1, select it, make sure you check the option to Create Folder Reference
-
-![alt tag](https://raw.github.com/andpor/react-native-sqlite-storage/master/instructions/addFilesToProjectSelect.png)
-
-#### Step 5 - Verify project structure
-
-Ensure your project structure after previous steps are executed looks like this
-
-![alt tag](https://raw.github.com/andpor/react-native-sqlite-storage/master/instructions/projectStructureAfter.png)
-
-### Step 6 - Adjust openDatabase call
-
-Modify you openDatabase call in your application adding createFromLocation param. If you named your database file in step 2 'testDB' the openDatabase call should look like something like this:
-```js
-
-  ...
-  1.SQLite.openDatabase({name : "testDB", createFromLocation : 1}, okCallback,errorCallback);
-  // default - if your folder is called www and data file is named the same as the dbName - testDB in this example
-  2.SQLite.openDatabase({name : "testDB", createFromLocation : "~data/mydbfile.sqlite"}, okCallback,errorCallback);
-  // if your folder is called data rather than www or your filename does not match the name of the db
-  3.SQLite.openDatabase({name : "testDB", createFromLocation : "/data/mydbfile.sqlite"}, okCallback,errorCallback);
-  // if your folder is not in app bundle but in app sandbox i.e. downloaded from some remote location.
-  ...
-
-```
-For Android, the www directory is always relative to the assets directory for the app: src/main/assets
-
-Enjoy!
-
-## Opening a database
-
-Opening a database is slightly different between iOS and Android. Where as on Android the location of the database file is fixed, there are three choices of where the database file can be located on iOS. The 'location' parameter you provide to openDatabase call indicated where you would like the file to be created. This parameter is neglected on Android.
+Opening a database is slightly different between iOS and Android. Where as on Android the location of the database file is fixed, there are three choices of where the database file can be located on iOS. The 'location' parameter you provide to openDatabase call indicates where you would like the file to be **created**. This will take the database in the location you have placed it in and will copy it into this package's ```localdatabase``` folder. If the database is ```read-only``` and no copying is needed, read further down. The 'location' parameter is neglected on Android.
 
 WARNING: the default location on iOS has changed in version 3.0.0 - it is now a no-sync location as mandated by Apple so the release is backward incompatible.
 
+### Default No-Sync Location
 
 To open a database in default no-sync location (affects iOS *only*)::
 
@@ -326,13 +305,13 @@ The original webSql style openDatabase still works and the location will implici
 SQLite.openDatabase("myDatabase.db", "1.0", "Demo", -1);
 ```
 
-## Opening a database in an App Group's Shared Container (iOS)
+### Opening a database in an App Group's Shared Container (iOS)
 
 If you have an iOS app extension which needs to share access to the same DB instance as your main app, you must use the shared container of a registered app group.
 
 Assuming you have already set up an app group and turned on the "App Groups" entitlement of both the main app and app extension, setting them to the same app group name, the following extra steps must be taken:
 
-#### Step 1 - supply your app group name in all needed `Info.plist`s
+##### Step 1 - supply your app group name in all needed `Info.plist`s
 
 In both `ios/MY_APP_NAME/Info.plist` and `ios/MY_APP_EXT_NAME/Info.plist` (along with any other app extensions you may have), you simply need to add the `AppGroupName` key to the main dictionary with your app group name as the string value:
 
@@ -347,7 +326,7 @@ In both `ios/MY_APP_NAME/Info.plist` and `ios/MY_APP_EXT_NAME/Info.plist` (along
 </plist>
 ```
 
-#### Step 2 - set shared database location
+##### Step 2 - set shared database location
 
 When calling `SQLite.openDatabase` in your React Native code, you need to set the `location` param to `'Shared'`:
 
@@ -355,30 +334,104 @@ When calling `SQLite.openDatabase` in your React Native code, you need to set th
 SQLite.openDatabase({name: 'my.db', location: 'Shared'}, successcb, errorcb);
 ```
 
-## Importing a pre-populated database.
+## Copy & Open Pre-Populated Database
 
-You can import an existing - prepopulated database file into your application. Depending on your instructions in openDatabase call, the sqlite-storage will look at different places to locate you pre-populated database file.
+### iOS
 
+#### Using the 'www' Folder
 
-Use this flavor of openDatabase call, if your folder is called www and data file is named the same as the dbName - testDB in this example
+##### Step 1 - Create 'www' folder.
 
+Create a folder called 'www' (yes must be called precisely that else things won't work) in the project folder via Finder
+
+##### Step 2 - Create the database file
+
+Copy/paste your pre-populated database file into the 'www' folder. Give it the same name you are going to use in openDatabase call in your application
+
+##### Step 3 - Add file to project
+
+In XCode, right click on the main folder and select Add Files to 'your project name'
+
+![alt tag](https://raw.github.com/andpor/react-native-sqlite-storage/master/instructions/addFilesToProject.png)
+
+##### Step 4 - Choose files to add
+
+In the Add Files dialog, navigate to the 'www' directory you created in Step 1, select it, make sure you check the option to Create Folder Reference
+
+![alt tag](https://raw.github.com/andpor/react-native-sqlite-storage/master/instructions/addFilesToProjectSelect.png)
+
+##### Step 5 - Verify project structure
+
+Ensure your project structure after previous steps are executed looks like this
+
+![alt tag](https://raw.github.com/andpor/react-native-sqlite-storage/master/instructions/projectStructureAfter.png)
+
+##### Step 6 - Call openDatabase
+
+Modify you openDatabase call in your application adding createFromLocation param. If you named your database file in step 2 'testDB' the openDatabase call should look like something like this:
 ```js
-SQLite.openDatabase({name : "testDB", createFromLocation : 1}, okCallback,errorCallback);
+
+  ...
+  // For this example, createFromLocation: 1 is default scenario. 
+  // Folder name: www
+  // Database filename: testDB
+
+  SQLite.openDatabase({name : "testDB", createFromLocation : 1}, okCallback,errorCallback);
+
+  ...
+
 ```
 
-Use this flavor of openDatabase call if your folder is called data rather than www or your filename does not match the name of the db. In this case db is named testDB but the file is mydbfile.sqlite which is located in a data subdirectory of www
+#### Database is in Main Bundle 
+
+If the database is in the main bundle but it is not in the www folder but in another folder then the openDatabase call would look something like the following:
 
 ```js
-SQLite.openDatabase({name : "testDB", createFromLocation : "~data/mydbfile.sqlite"}, okCallback,errorCallback);
+  ...
+  // Folder name: data
+  // Database filename: mydbfile.sqlite
+  SQLite.openDatabase({name : "testDB", createFromLocation : "~data/mydbfile.sqlite"}, okCallback,errorCallback);
+  ...
 ```
 
-Use this flavor of openDatabase call if your folder is not in application bundle but in app sandbox i.e. downloaded from some remote location. In this case the source file is located in data subdirectory of Documents location (iOS) or FilesDir (Android).
+#### Database is Not in Main Bundle
+
+if your database is not in the react native app bundle but rather in the an app sandbox environment (ex: caches, documents directory), then the openDatabase call would look something like the following: 
 
 ```js
-SQLite.openDatabase({name : "testDB", createFromLocation : "/data/mydbfile.sqlite"}, okCallback,errorCallback);
+  ...
+  // Folder name: data
+  // Database filename: mydbfile.sqlite
+  SQLite.openDatabase({name : "testDB", createFromLocation : "/data/mydbfile.sqlite"}, okCallback,errorCallback);
+  ...
 ```
 
-## Additional options for pre-populated database file
+- For caches directory and encrypted database, the openDatabase call would look like: 
+
+```js
+  ...
+  // Folder name: data
+  // Database filename: mydbfile.sqlite
+    SQLite.openDatabase({ name: 'testDB', key: 'testPassword', readOnly: true, createFromLocation: 'caches/mydbfile.sqlite',
+  }, openCB, errorCB);
+  ...
+```
+
+Note: `readOnly: true` prevents the need to copy the database and opens at the location the database is. More on this below
+
+### Android
+
+For Android, the www directory is always relative to the assets directory for the app: src/main/assets
+
+Enjoy!
+
+## Promises
+To enable promises, run 
+```javascript
+SQLite.enablePromise(true);
+```
+
+## Additional Options for Pre-Populated Database Files
 
 You can provide additional instructions to sqlite-storage to tell it how to handle your pre-populated database file. By default, the source file is copied over to the internal location which works in most cases but sometimes this is not really an option particularly when the source db file is large. In such situations you can tell sqlite-storage you do not want to copy the file but rather use it in read-only fashion via direct access. You accomplish this by providing an additional optional readOnly parameter to openDatabase call
 
@@ -388,7 +441,7 @@ SQLite.openDatabase({name : "testDB", readOnly: true, createFromLocation : "/dat
 
 Note that in this case, the source db file will be open in read-only mode and no updates will be allowed. You cannot delete a database that was open with readOnly option. For Android, the read only option works with pre-populated db files located in FilesDir directory because all other assets are never physically located on the file system but rather read directly from the app bundle.
 
-## Attaching another database
+## Attaching Another Database
 
 Sqlite3 offers the capability to attach another database to an existing database-instance, i.e. for making cross database JOINs available.
 This feature allows to SELECT and JOIN tables over multiple databases with only one statement and only one database connection.
@@ -427,11 +480,11 @@ dbMaster.detach( 'second', successCallback, errorCallback );
 For sure, their is also Promise-support available for attach() and detach(), as shown in the example-application under the
 directory "examples".
 
-# Original Cordova SQLite Bindings from Chris Brody and Davide Bertola
+## Original Cordova SQLite Bindings from Chris Brody and Davide Bertola
 https://github.com/litehelpers/Cordova-sqlite-storage
 
 The issues and limitations for the actual SQLite can be found on this site.
 
-## Issues
+### Issues
 
 1. Android binds all numeric SQL input values to double. This is due to the underlying React Native limitation where only a Numeric type is available on the interface point making it ambiguous to distinguish integers from doubles. Once I figure out the proper way to do this I will update the codebase [(Issue #4141)] (https://github.com/facebook/react-native/issues/4141).
