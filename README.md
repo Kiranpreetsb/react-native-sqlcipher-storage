@@ -37,7 +37,7 @@ The library has been tested with React 16.2 (and earlier) and XCode 7,8,9 - it w
 Version 3.2 is the first version compatible with RN 0.40.
 
 ## Differences in this Fork
-This fork was created after countless hours of trying to open an encrypted database, attempting to follow instructions on the master repo's issues discussions about how to open an encrypted database and debugging other issues. This fork is meant to open an encrypted database straight out of the box. Along with encrypted database, this fork allows the use of the cache directory for iOS. 
+This fork was created after countless hours of trying to open an encrypted database, attempting to follow instructions on the master repo's issues discussions about how to open an encrypted database and debugging other issues. This fork is meant to open an encrypted database straight out of the box. Along with encrypted database, this fork allows the use of the `Library` directory for iOS. 
 
 Again, thank you for all the developer that created this package. The work I have put into this is very minimal. 
 
@@ -396,7 +396,7 @@ If the database is in the main bundle but it is not in the www folder but in ano
 
 #### Database is Not in Main Bundle
 
-if your database is not in the react native app bundle but rather in the an app sandbox environment (ex: caches, documents directory), then the openDatabase call would look something like the following: 
+if your database is not in the react native app bundle but rather in the an app sandbox environment (ex: library, documents directory), then the openDatabase call would look something like the following: 
 
 ```js
   ...
@@ -406,13 +406,13 @@ if your database is not in the react native app bundle but rather in the an app 
   ...
 ```
 
-- For caches directory and encrypted database, the openDatabase call would look like: 
+- For Library directory and encrypted database, the openDatabase call would look like: 
 
 ```js
   ...
   // Folder name: data
   // Database filename: mydbfile.sqlite
-    SQLite.openDatabase({ name: 'testDB', key: 'testPassword', readOnly: true, createFromLocation: 'caches/mydbfile.sqlite',
+    SQLite.openDatabase({ name: 'testDB', key: 'testPassword', readOnly: true, createFromLocation: 'Library/mydbfile.sqlite',
   }, openCB, errorCB);
   ...
 ```
