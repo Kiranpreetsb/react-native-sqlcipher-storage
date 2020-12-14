@@ -1,5 +1,5 @@
 /**
- * Test App using JSON1 functionality for react-native-sqlite-storage
+ * Test App using JSON1 functionality for react-native-sqlcipher-storage
  *
  * This library is available under the terms of the MIT License (2008).
  * See http://opensource.org/licenses/alphabetical for full text.
@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import ListView from 'deprecated-react-native-listview';
 
-import SQLite from 'react-native-sqlite-storage';
+import SQLite from 'react-native-sqlcipher-storage';
 SQLite.DEBUG(true);
 SQLite.enablePromise(false);
 

@@ -1,7 +1,7 @@
 /*
 * AwaitingQueue.cs
 * 
-* This class is copied directly into the react-native-sqlite-storage repo
+* This class is copied directly into the react-native-sqlcipher-storage repo
 * for now. When this gets checked into react-native-windows, we can remove
 * this file and start depending on that RNW's copy.
 * 
