@@ -186,10 +186,13 @@ RCT_EXPORT_METHOD(open: (NSDictionary *) options success:(RCTResponseSenderBlock
               NSString *targetBundleDirPath = [[NSBundle mainBundle] resourcePath];
               assetFilePath = [targetBundleDirPath stringByAppendingPathComponent: assetFilePath];
               RCTLog(@"Built path to pre-populated DB asset from app bundle subdirectory: %@",assetFilePath);
-            } else if ([assetFilePath containsString:@"caches"]) {
-                NSURL * cachesDirUrl = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory
+            } else if ([assetFilePath containsString:@"Library"]) {
+                NSURL * documentsDirUrl = [[[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory
                                                                           inDomains:NSUserDomainMask] lastObject];
-                assetFilePath = [cachesDirUrl.path stringByAppendingPathComponent:assetFilePath];
+                
+                assetFilePath = [assetFilePath stringByReplacingOccurrencesOfString:@"Library/" withString:@""];
+                assetFilePath = [documentsDirUrl.path stringByAppendingPathComponent:assetFilePath];
+
                 RCTLog(@"Built path to pre-populated DB asset from app sandbox caches directory: %@",assetFilePath);
             } else {
               NSURL * documentsDirUrl = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
