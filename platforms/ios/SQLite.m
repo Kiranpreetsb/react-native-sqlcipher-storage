@@ -193,7 +193,7 @@ RCT_EXPORT_METHOD(open: (NSDictionary *) options success:(RCTResponseSenderBlock
                 assetFilePath = [assetFilePath stringByReplacingOccurrencesOfString:@"Library/" withString:@""];
                 assetFilePath = [documentsDirUrl.path stringByAppendingPathComponent:assetFilePath];
 
-                RCTLog(@"Built path to pre-populated DB asset from app sandbox caches directory: %@",assetFilePath);
+                RCTLog(@"Built path to pre-populated DB asset from app sandbox library directory: %@",assetFilePath);
             } else {
               NSURL * documentsDirUrl = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
                                                                         inDomains:NSUserDomainMask] lastObject];
