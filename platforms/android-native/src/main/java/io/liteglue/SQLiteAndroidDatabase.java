@@ -81,12 +81,7 @@ class SQLiteAndroidDatabase {
             this.mydb = SQLiteDatabase.openDatabase(dbfile.getAbsolutePath(), key, null, openFlags);
         } catch (Exception e) {
             System.out.println(e);
-            System.out.println("KSB");
         }
-
-        System.out.println(mydb.isOpen());
-
-        System.out.println("KSB");
     }
 
     /**
@@ -115,9 +110,6 @@ class SQLiteAndroidDatabase {
     @SuppressLint("NewApi")
     void executeSqlBatch(String[] queryArr, ReadableArray[] queryParams,
                          String[] queryIDs, CallbackContext cbc) {
-
-        System.out.println("KSB");
-
         if (mydb == null) {
             // not allowed - can only happen if someone has closed (and possibly deleted) a database and then re-used the database
             cbc.error("database has been closed");

@@ -11,7 +11,9 @@
     * [Android](#Android-1)
 5. [Promises](#Promises)
 6. [Additional Options for Pre-Populated Database Files](#Additional-Options-for-Pre-Populated-Database-Files)
+    * [Read Only (No Copying)](#Read-Only-(No-Copying))
 7. [Attaching Another Database](#Attaching-Another-database)
+8. [Encryption](#Encryption)
 
 <br><br>
 
@@ -114,7 +116,11 @@ Add libSQLite.a (from Workspace location) to the required Libraries and Framewor
 ##### Step 2. Application JavaScript require
 
 ```javascript
-import SQLite from 'react-native-sqlite-storage';
+import { SQLite } from 'react-native-sqlite-storage';
+
+// On Android and encrypted databases use this instead:
+import { SQLCipher } from 'react-native-sqlite-storage';
+
 ```
 
 ##### Step 3. Write application JavaScript code using the SQLite plugin
@@ -162,8 +168,9 @@ db.transaction((tx) => {
 ### Android
 
 ### React Native 0.60 and above
-If you would like to use the devices SQLite there are no extra steps.
-However, if you would like to use the SQLite bundled with this library (includes support for FTS5), add the following to your `react-native.config.js`
+For Android there are no needed steps to use with Sqlite and SqlCipher (encrypted databases).
+
+However, if you would like to use the SQLite bundled with this LiteGlue (includes support for FTS5), add the following to your `react-native.config.js`
 
 ```javascript
 module.exports = {
@@ -421,9 +428,70 @@ Note: `readOnly: true` prevents the need to copy the database and opens at the l
 
 ### Android
 
-For Android, the www directory is always relative to the assets directory for the app: src/main/assets
+For Android, the www directory is always relative to the assets directory for the app: src/main/assets.
 
-Enjoy!
+#### Using the 'www' Folder
+
+##### Step 1 - Create 'www' folder.
+
+Create a folder called 'www' (yes must be called precisely that else things won't work) in the project folder via Finder
+
+##### Step 2 - Create the database file
+
+Copy/paste your pre-populated database file into the 'www' folder. Give it the same name you are going to use in openDatabase call in your application
+
+##### Step 3 - Call openDatabase
+
+Modify you openDatabase call in your application adding createFromLocation param. If you named your database file in step 2 'testDB' the openDatabase call should look like something like this:
+```js
+
+  ...
+  // For this example, createFromLocation: 1 is default scenario. 
+  // Folder name: www
+  // Database filename: testDB
+
+  SQLite.openDatabase({name : "testDB", createFromLocation : 1}, okCallback,errorCallback);
+
+  ...
+
+```
+
+#### Database is in Main Bundle 
+
+If the database is in the main bundle but it is not in the www folder but in another folder then the openDatabase call would look something like the following:
+
+```js
+  ...
+  // Folder name: data
+  // Database filename: mydbfile.sqlite
+  SQLite.openDatabase({name : "testDB", createFromLocation : "~data/mydbfile.sqlite"}, okCallback,errorCallback);
+  ...
+```
+
+#### Database is Not in Main Bundle
+
+if your database is not in the react native app bundle but rather in the an app sandbox environment (ex: library, documents directory), then the openDatabase call would look something like the following: 
+
+```js
+  ...
+  // Folder name: data
+  // Database filename: mydbfile.sqlite
+  SQLite.openDatabase({name : "testDB", createFromLocation : "/data/mydbfile.sqlite"}, okCallback,errorCallback);
+  ...
+```
+
+- For Database directory and encrypted database, the openDatabase call would look like: 
+
+```js
+  ...
+  // Folder name: data
+  // Database filename: mydbfile.sqlite
+    SQLCipher.openDatabase({ name: 'testDB', key: 'testPassword', readOnly: true, createFromLocation: 'databases/mydbfile.sqlite',
+  }, openCB, errorCB);
+  ...
+```
+
+Note: `readOnly: true` prevents the need to copy the database and opens at the location the database is. More on this below
 
 ## Promises
 To enable promises, run 
@@ -432,6 +500,8 @@ SQLite.enablePromise(true);
 ```
 
 ## Additional Options for Pre-Populated Database Files
+
+### Read Only (No Copying)
 
 You can provide additional instructions to sqlite-storage to tell it how to handle your pre-populated database file. By default, the source file is copied over to the internal location which works in most cases but sometimes this is not really an option particularly when the source db file is large. In such situations you can tell sqlite-storage you do not want to copy the file but rather use it in read-only fashion via direct access. You accomplish this by providing an additional optional readOnly parameter to openDatabase call
 
@@ -479,6 +549,42 @@ dbMaster.detach( 'second', successCallback, errorCallback );
 
 For sure, their is also Promise-support available for attach() and detach(), as shown in the example-application under the
 directory "examples".
+
+## Encryption
+Using encyption on iOS and Android is slightly different. 
+
+### iOS 
+
+#### Encrypted Database
+
+``` javascript 
+SQLite.openDatabase({ name: 'testDB', key: 'testpassword', readOnly: true, createFromLocation: 'Library/Caches/testDB.sqlite', }, openCB, errorCB);
+```
+
+#### Unencrypted Database
+
+``` javascript 
+SQLite.openDatabase({ name: 'testDB', readOnly: true, createFromLocation: 'Library/Caches/testDB.sqlite', }, openCB, errorCB);
+```
+
+### Android 
+
+#### Encrypted Database
+
+``` javascript 
+// Note SQLCipher vs. SQLite
+SQLCipher.openDatabase({ name: 'testDB', key: 'testpassword', createFromLocation: 'databases/testDB.sqlite', }, openCB, errorCB);
+```
+
+#### Unencrypted Database
+
+``` javascript 
+SQLite.openDatabase({ name: 'testDB', createFromLocation: 'databases/testDB.sqlite', }, openCB, errorCB);
+```
+
+
+
+
 
 ## Original Cordova SQLite Bindings from Chris Brody and Davide Bertola
 https://github.com/litehelpers/Cordova-sqlite-storage
