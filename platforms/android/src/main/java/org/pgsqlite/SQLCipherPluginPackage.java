@@ -15,20 +15,19 @@ import com.facebook.react.uimanager.ViewManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
-
 import java.util.List;
 
-public class SQLitePluginPackage implements ReactPackage {
+public class SQLCipherPluginPackage implements ReactPackage {
 
     /**
      * @deprecated, use method without activity
      * activity parameter is ignored
      */
-    public SQLitePluginPackage(Activity activity){
+    public SQLCipherPluginPackage(Activity activity){
         this();
     }
 
-    public SQLitePluginPackage() {
+    public SQLCipherPluginPackage() {
     }
 
     @Override

@@ -10,9 +10,9 @@ package io.liteglue;
 import android.annotation.SuppressLint;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteStatement;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteException;
+import net.sqlcipher.database.SQLiteStatement;
 
 import android.util.Base64;
 
@@ -52,7 +52,7 @@ class SQLiteAndroidDatabase {
      * @param dbfile   The database File specification
      */
     void open(File dbfile) throws Exception {
-        this.open(dbfile,SQLiteOpenFlags.READWRITE | SQLiteOpenFlags.CREATE);
+        this.open(dbfile, SQLiteDatabase.CREATE_IF_NECESSARY);
     }
 
     /**
@@ -63,7 +63,30 @@ class SQLiteAndroidDatabase {
     void open(File dbfile, int openFlags) throws Exception {
         this.dbFile = dbfile; // for possible bug workaround
         this.openFlags = openFlags;
-        this.mydb = SQLiteDatabase.openDatabase(dbfile.getAbsolutePath(), null, openFlags);
+        this.mydb = SQLiteDatabase.openDatabase(dbfile.getAbsolutePath(), "", null, openFlags);
+    }
+
+    /**
+     * Open an encrypted database.
+     *
+     * @param dbfile   The database File specification
+     * @param key      The key/password to open the database
+     */
+    void open(File dbfile, String key, int openFlags) throws Exception {
+        this.dbFile = dbfile; // for possible bug workaround
+        this.openFlags = openFlags;
+        this.mydb = SQLiteDatabase.openDatabase(dbfile.getAbsolutePath(), key, null, openFlags);
+
+        try {
+            this.mydb = SQLiteDatabase.openDatabase(dbfile.getAbsolutePath(), key, null, openFlags);
+        } catch (Exception e) {
+            System.out.println(e);
+            System.out.println("KSB");
+        }
+
+        System.out.println(mydb.isOpen());
+
+        System.out.println("KSB");
     }
 
     /**
@@ -91,7 +114,9 @@ class SQLiteAndroidDatabase {
      */
     @SuppressLint("NewApi")
     void executeSqlBatch(String[] queryArr, ReadableArray[] queryParams,
-                                 String[] queryIDs, CallbackContext cbc) {
+                         String[] queryIDs, CallbackContext cbc) {
+
+        System.out.println("KSB");
 
         if (mydb == null) {
             // not allowed - can only happen if someone has closed (and possibly deleted) a database and then re-used the database
@@ -276,8 +301,8 @@ class SQLiteAndroidDatabase {
      * @return results in string form
      */
     private WritableMap executeSqlStatementQuery(SQLiteDatabase mydb,
-                                                String query, ReadableArray queryParams,
-                                                CallbackContext cbc) throws Exception {
+                                                 String query, ReadableArray queryParams,
+                                                 CallbackContext cbc) throws Exception {
         WritableMap rowsResult = Arguments.createMap();
 
         Cursor cur;

@@ -192,6 +192,9 @@ public class SQLitePlugin extends ReactContextBaseJavaModule {
             throw ex;
         }
         try {
+            System.out.println(action);
+            System.out.println(args);
+            System.out.println(cbc);
             return executeAndPossiblyThrow(action, args, cbc);
         } catch (Exception ex) {
             FLog.e(TAG, "unexpected error", ex);
@@ -363,9 +366,30 @@ public class SQLitePlugin extends ReactContextBaseJavaModule {
                     try {
                         in = this.getContext().getAssets().open(assetFilePath);
                         FLog.v(TAG, "Pre-populated DB asset FOUND in app bundle subdirectory: " + assetFilePath);
-                    } catch (Exception ex){
+                    } catch (Exception ex) {
                         assetImportError = true;
                         FLog.e(TAG, "pre-populated DB asset NOT FOUND in app bundle www subdirectory: " + assetFilePath);
+                    }
+                } else if (assetFilePath.toLowerCase().contains("databases")){
+                    assetFilePath = assetFilePath.replace("databases/", "");
+                    assetFilePath = assetFilePath.replace("Databases/", "");
+                    File databaseFile = this.getContext().getDatabasePath(assetFilePath);
+
+                    try {
+                        in = new FileInputStream(databaseFile);
+                        FLog.v(TAG, "Pre-populated DB asset FOUND in Database subdirectory: " + databaseFile.getCanonicalPath());
+
+                        System.out.println("KSB");
+                        System.out.println(assetFilePath);
+                        System.out.println(databaseFile.getCanonicalPath());
+
+                        if (openFlags == SQLiteDatabase.OPEN_READONLY) {
+                            dbfile = databaseFile;
+                            FLog.v(TAG, "Detected read-only mode request for external asset.");
+                        }
+                    } catch (Exception ex){
+                        assetImportError = true;
+                        FLog.v(TAG, "Detected read-only mode request for external asset.");
                     }
                 } else {
                     File filesDir = this.getContext().getFilesDir();
@@ -412,6 +436,8 @@ public class SQLitePlugin extends ReactContextBaseJavaModule {
             FLog.v(TAG, "DB file is ready, proceeding to OPEN SQLite DB: " + dbfile.getAbsolutePath());
 
             SQLiteDatabase mydb = SQLiteDatabase.openDatabase(dbfile.getAbsolutePath(), null, openFlags);
+
+            System.out.println(mydb.isOpen());
 
             if (cbc != null)
                 cbc.success("Database opened");
@@ -582,41 +608,32 @@ public class SQLitePlugin extends ReactContextBaseJavaModule {
     @SuppressLint("NewApi")
     private void executeSqlBatch(String dbname, String[] queries, ReadableArray[] queryParams,
                                  String[] queryIDs, CallbackContext cbc) {
-
         SQLiteDatabase mydb = getDatabase(dbname);
-
         if (mydb == null) {
             // not allowed - can only happen if someone has closed (and possibly deleted) a database and then re-used the database
             cbc.error("database has been closed");
             return;
         }
-
         String query;
         String query_id;
         int len = queries.length;
         WritableArray batchResults = Arguments.createArray();
-
         for (int i = 0; i < len; i++) {
             query_id = queryIDs[i];
-
             WritableMap queryResult = null;
             String errorMessage = "unknown";
-
             try {
                 boolean needRawQuery = true;
                 query = queries[i];
                 QueryType queryType = getQueryType(query);
-
                 if (queryType == QueryType.update || queryType == QueryType.delete) {
                     SQLiteStatement myStatement = null;
                     int rowsAffected = -1; // (assuming invalid)
-
                     try {
                         myStatement = mydb.compileStatement(query);
                         if (queryParams != null) {
                             bindArgsToStatement(myStatement, queryParams[i]);
                         }
-
                         rowsAffected = myStatement.executeUpdateDelete();
                         // Indicate valid results:
                         needRawQuery = false;
@@ -628,27 +645,20 @@ public class SQLitePlugin extends ReactContextBaseJavaModule {
                     } finally {
                         closeQuietly(myStatement);
                     }
-
                     if (rowsAffected != -1) {
                         queryResult = Arguments.createMap();
                         queryResult.putInt("rowsAffected", rowsAffected);
                     }
                 }
-
                 // INSERT:
                 else if (queryType == QueryType.insert && queryParams != null) {
                     FLog.d("executeSqlBatch","INSERT");
                     needRawQuery = false;
-
                     SQLiteStatement myStatement = mydb.compileStatement(query);
-
                     bindArgsToStatement(myStatement, queryParams[i]);
-
                     long insertId; // (invalid) = -1
-
                     try {
                         insertId = myStatement.executeInsert();
-
                         // statement has finished with no constraint violation:
                         queryResult = Arguments.createMap();
                         if (insertId != -1) {
@@ -666,12 +676,9 @@ public class SQLitePlugin extends ReactContextBaseJavaModule {
                         closeQuietly(myStatement);
                     }
                 }
-
                 else if (queryType == QueryType.begin) {
                     needRawQuery = false;
                     try {
-                        mydb.beginTransaction();
-
                         queryResult = Arguments.createMap();
                         queryResult.putInt("rowsAffected", 0);
                     } catch (SQLiteException ex) {
@@ -679,13 +686,9 @@ public class SQLitePlugin extends ReactContextBaseJavaModule {
                         FLog.e(TAG, "SQLiteDatabase.beginTransaction() failed", ex);
                     }
                 }
-
                 else if (queryType == QueryType.commit) {
                     needRawQuery = false;
                     try {
-                        mydb.setTransactionSuccessful();
-                        mydb.endTransaction();
-
                         queryResult = Arguments.createMap();
                         queryResult.putInt("rowsAffected", 0);
                     } catch (SQLiteException ex) {
@@ -693,12 +696,9 @@ public class SQLitePlugin extends ReactContextBaseJavaModule {
                         FLog.e(TAG, "SQLiteDatabase.setTransactionSuccessful/endTransaction() failed", ex);
                     }
                 }
-
                 else if (queryType == QueryType.rollback) {
                     needRawQuery = false;
                     try {
-                        mydb.endTransaction();
-
                         queryResult = Arguments.createMap();
                         queryResult.putInt("rowsAffected", 0);
                     } catch (SQLiteException ex) {
@@ -706,7 +706,6 @@ public class SQLitePlugin extends ReactContextBaseJavaModule {
                         FLog.e(TAG, "SQLiteDatabase.endTransaction() failed", ex);
                     }
                 }
-
                 // raw query for other statements:
                 if (needRawQuery) {
                     queryResult = this.executeSqlStatementQuery(mydb, query, queryParams != null ? queryParams[i] : null, cbc);
@@ -715,28 +714,22 @@ public class SQLitePlugin extends ReactContextBaseJavaModule {
                 errorMessage = ex.getMessage();
                 FLog.e(TAG, "SQLitePlugin.executeSql[Batch](): failed", ex);
             }
-
             if (queryResult != null) {
                 WritableMap r = Arguments.createMap();
                 r.putString("qid", query_id);
-
                 r.putString("type", "success");
                 r.putMap("result", queryResult);
-
                 batchResults.pushMap(r);
             } else {
                 WritableMap r = Arguments.createMap();
                 r.putString("qid", query_id);
                 r.putString("type", "error");
-
                 WritableMap er = Arguments.createMap();
                 er.putString("message", errorMessage);
                 r.putMap("result", er);
-
                 batchResults.pushMap(r);
             }
         }
-
         cbc.success(batchResults);
     }
 
